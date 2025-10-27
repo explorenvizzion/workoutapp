@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'history_screen.dart'; // you'll add this file below
+
 final sb = Supabase.instance.client;
 
 /* ---------------------------- Data model helper ---------------------------- */
@@ -218,6 +220,21 @@ class _SetsEditorScreenState extends State<SetsEditorScreen> {
         title: const Text('Log your sets'),
         actions: [
           IconButton(onPressed: _saveAll, icon: const Icon(Icons.save)),
+          IconButton(
+            tooltip: 'Finish workout',
+            onPressed: () async {
+              await _saveAll();
+              await Supabase.instance.client.from('workouts').update({
+                'ended_at': DateTime.now().toUtc().toIso8601String()
+              }).eq('id', widget.workoutId);
+              if (!mounted) return;
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (_) => const HistoryScreen()),
+                (_) => false,
+              );
+            },
+            icon: const Icon(Icons.flag),
+          ),
         ],
       ),
       body: error != null
@@ -337,3 +354,7 @@ class _SetsEditorScreenState extends State<SetsEditorScreen> {
     ]);
   }
 }
+
+//history//
+
+

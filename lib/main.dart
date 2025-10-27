@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'screens/sets_editor_screen.dart'; // adjust the path if needed
 
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -234,10 +235,61 @@ class _ExercisePickerScreenState extends State<ExercisePickerScreen> {
   bool creating = false;
   String? error;
 
+  // Future<void> createWorkout() async {
+  //   if (selected.isEmpty) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(content: Text('Select at least one exercise.')));
+  //     return;
+  //   }
+  //   setState(() {
+  //     creating = true;
+  //     error = null;
+  //   });
+  //   try {
+  //     final userId = sb.auth.currentUser!.id;
+  //     // 1) Create workout
+  //     final workout = await sb
+  //         .from('workouts')
+  //         .insert({
+  //           'user_id': userId,
+  //           'title': 'Workout ${DateTime.now().toLocal()}',
+  //         })
+  //         .select()
+  //         .single();
+
+  //     final workoutId = workout['id'] as int;
+
+  //     // 2) Add workout_exercises with sort_order
+  //     final rows = <Map<String, dynamic>>[];
+  //     var order = 1;
+  //     for (final ex in selected.values) {
+  //       rows.add({
+  //         'workout_id': workoutId,
+  //         'exercise_id': ex['id'],
+  //         'sort_order': order++
+  //       });
+  //     }
+  //     await sb.from('workout_exercises').insert(rows);
+
+  //     if (!mounted) return;
+  //     Navigator.of(context).pushReplacement(MaterialPageRoute(
+  //       builder: (_) => WorkoutCreatedScreen(
+  //           workoutId: workoutId,
+  //           exerciseNames:
+  //               selected.values.map((e) => e['name'] as String).toList()),
+  //     ));
+  //   } catch (e) {
+  //     setState(() => error = e.toString());
+  //   } finally {
+  //     if (mounted) setState(() => creating = false);
+  //   }
+  // }
+
   Future<void> createWorkout() async {
     if (selected.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Select at least one exercise.')));
+        const SnackBar(content: Text('Select at least one exercise.')),
+      );
       return;
     }
     setState(() {
@@ -246,6 +298,7 @@ class _ExercisePickerScreenState extends State<ExercisePickerScreen> {
     });
     try {
       final userId = sb.auth.currentUser!.id;
+
       // 1) Create workout
       final workout = await sb
           .from('workouts')
@@ -265,18 +318,18 @@ class _ExercisePickerScreenState extends State<ExercisePickerScreen> {
         rows.add({
           'workout_id': workoutId,
           'exercise_id': ex['id'],
-          'sort_order': order++
+          'sort_order': order++,
         });
       }
       await sb.from('workout_exercises').insert(rows);
 
+      // 3) Navigate to the sets editor — THIS is the correct place
       if (!mounted) return;
-      Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (_) => WorkoutCreatedScreen(
-            workoutId: workoutId,
-            exerciseNames:
-                selected.values.map((e) => e['name'] as String).toList()),
-      ));
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (_) => SetsEditorScreen(workoutId: workoutId),
+        ),
+      );
     } catch (e) {
       setState(() => error = e.toString());
     } finally {

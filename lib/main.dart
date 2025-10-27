@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'screens/sets_editor_screen.dart'; // adjust the path if needed
-
+import 'screens/history_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -179,6 +179,12 @@ class _StartWorkoutScreenState extends State<StartWorkoutScreen> {
       appBar: AppBar(
         title: const Text('Start Workout'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.history),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const HistoryScreen()),
+            ),
+          ),
           IconButton(
             tooltip: 'Sign out',
             onPressed: () => sb.auth.signOut(),

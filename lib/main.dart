@@ -4,6 +4,7 @@ import 'screens/sets_editor_screen.dart'; // adjust the path if needed
 import 'screens/history_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'screens/home_shell.dart';
 
 const supabaseUrl = 'https://uzaglixigsdauaodvoer.supabase.co';
 const supabaseKey = String.fromEnvironment('SUPABASE_KEY');
@@ -34,7 +35,7 @@ class MyApp extends StatelessWidget {
         builder: (context, snapshot) {
           final session = sb.auth.currentSession;
           if (session == null) return const AuthScreen();
-          return const StartWorkoutScreen();
+          return const HomeShell();
         },
       ),
     );
@@ -133,100 +134,101 @@ const kBodyParts = [
   'core'
 ];
 
-class StartWorkoutScreen extends StatefulWidget {
-  const StartWorkoutScreen({super.key});
-  @override
-  State<StartWorkoutScreen> createState() => _StartWorkoutScreenState();
-}
+// class StartWorkoutScreen extends StatefulWidget {
+//   const StartWorkoutScreen({super.key});
+//   @override
+//   State<StartWorkoutScreen> createState() => _StartWorkoutScreenState();
+// }
 
-class _StartWorkoutScreenState extends State<StartWorkoutScreen> {
-  final selected = <String>{};
-  bool loading = false;
-  String? error;
+// class _StartWorkoutScreenState extends State<StartWorkoutScreen> {
+//   final selected = <String>{};
+//   bool loading = false;
+//   String? error;
 
-  Future<void> goPickExercises() async {
-    if (selected.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Pick at least one body part.')));
-      return;
-    }
-    setState(() {
-      loading = true;
-      error = null;
-    });
-    try {
-      // Fetch exercises that CONTAIN any of the selected body parts.
-      final res = await sb
-          .from('exercise_catalog')
-          .select()
-          .overlaps('body_parts', selected.toList()); // GIN index-friendly
-      if (!mounted) return;
-      Navigator.of(context).push(MaterialPageRoute(
-        builder: (_) => ExercisePickerScreen(
-            exercises: List<Map<String, dynamic>>.from(res)),
-      ));
-    } catch (e) {
-      setState(() => error = e.toString());
-    } finally {
-      if (mounted) setState(() => loading = false);
-    }
-  }
+//   Future<void> goPickExercises() async {
+//     if (selected.isEmpty) {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//           const SnackBar(content: Text('Pick at least one body part.')));
+//       return;
+//     }
+//     setState(() {
+//       loading = true;
+//       error = null;
+//     });
+//     try {
+//       // Fetch exercises that CONTAIN any of the selected body parts.
+//       final res = await sb
+//           .from('exercise_catalog')
+//           .select()
+//           .overlaps('body_parts', selected.toList()); // GIN index-friendly
+//       if (!mounted) return;
+//       Navigator.of(context).push(MaterialPageRoute(
+//         builder: (_) => ExercisePickerScreen(
+//             exercises: List<Map<String, dynamic>>.from(res)),
+//       ));
+//     } catch (e) {
+//       setState(() => error = e.toString());
+//     } finally {
+//       if (mounted) setState(() => loading = false);
+//     }
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    final user = sb.auth.currentUser;
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Start Workout'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.history),
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const HistoryScreen()),
-            ),
-          ),
-          IconButton(
-            tooltip: 'Sign out',
-            onPressed: () => sb.auth.signOut(),
-            icon: const Icon(Icons.logout),
-          )
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Hello ${user?.email ?? ''}',
-              style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 8),
-          Text('Choose body parts',
-              style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              for (final part in kBodyParts)
-                FilterChip(
-                  selected: selected.contains(part),
-                  onSelected: (v) => setState(
-                      () => v ? selected.add(part) : selected.remove(part)),
-                  label: Text(part),
-                )
-            ],
-          ),
-          const Spacer(),
-          if (error != null)
-            Text(error!, style: const TextStyle(color: Colors.red)),
-          FilledButton.icon(
-            onPressed: loading ? null : goPickExercises,
-            icon: const Icon(Icons.navigate_next),
-            label: Text(loading ? 'Loading...' : 'Pick exercises'),
-          ),
-        ]),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     final user = sb.auth.currentUser;
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('Start Workout'),
+//         actions: [
+//           IconButton(
+//             tooltip: 'History',
+//             icon: const Icon(Icons.history),
+//             onPressed: () => Navigator.of(context).push(
+//               MaterialPageRoute(builder: (_) => const HistoryScreen()),
+//             ),
+//           ),
+//           IconButton(
+//             tooltip: 'Sign out',
+//             onPressed: () => sb.auth.signOut(),
+//             icon: const Icon(Icons.logout),
+//           )
+//         ],
+//       ),
+//       body: Padding(
+//         padding: const EdgeInsets.all(16),
+//         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+//           Text('Hello ${user?.email ?? ''}',
+//               style: Theme.of(context).textTheme.titleMedium),
+//           const SizedBox(height: 8),
+//           Text('Choose body parts',
+//               style: Theme.of(context).textTheme.titleLarge),
+//           const SizedBox(height: 8),
+//           Wrap(
+//             spacing: 8,
+//             runSpacing: 8,
+//             children: [
+//               for (final part in kBodyParts)
+//                 FilterChip(
+//                   selected: selected.contains(part),
+//                   onSelected: (v) => setState(
+//                       () => v ? selected.add(part) : selected.remove(part)),
+//                   label: Text(part),
+//                 )
+//             ],
+//           ),
+//           const Spacer(),
+//           if (error != null)
+//             Text(error!, style: const TextStyle(color: Colors.red)),
+//           FilledButton.icon(
+//             onPressed: loading ? null : goPickExercises,
+//             icon: const Icon(Icons.navigate_next),
+//             label: Text(loading ? 'Loading...' : 'Pick exercises'),
+//           ),
+//         ]),
+//       ),
+//     );
+//   }
+// }
 
 /* ----------------------------- EXERCISE PICKER ----------------------------- */
 class ExercisePickerScreen extends StatefulWidget {
@@ -427,7 +429,7 @@ class WorkoutCreatedScreen extends StatelessWidget {
           FilledButton(
             onPressed: () =>
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
-              builder: (_) => const StartWorkoutScreen(),
+              builder: (_) => const HomeShell(),
             )),
             child: const Text('Back to start'),
           ),
